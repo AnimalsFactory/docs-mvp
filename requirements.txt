@@ -4,3 +4,4 @@ flask-login
 python-dotenv
 beautifulsoup4
 python-docx
+gunicorn
