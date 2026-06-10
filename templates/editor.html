@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}{{ document.title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto bg-white min-h-screen shadow-xl">
+    <!-- Верхняя панель -->
+    <div class="border-b sticky top-0 bg-white z-20 shadow-sm">
+        <div class="px-8 py-4 flex items-center gap-4">
+            <a href="/" class="text-gray-600 hover:text-black font-medium flex items-center gap-2">
+                ← Все документы
+            </a>
+            
+            <input id="title-input" 
+                   value="{{ document.title }}" 
+                   class="flex-1 text-2xl font-semibold focus:outline-none bg-transparent border-b border-transparent focus:border-blue-300 px-3 py-1 rounded">
+
+            <!-- Кнопки действий -->
+            <button onclick="saveDocument(true)" 
+                    class="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-lg font-medium flex items-center gap-2">
+                💾 Сохранить
+            </button>
+
+            <button onclick="window.location.href='/export/docx/{{ document.id }}'" 
+                    class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2.5 rounded-lg font-medium flex items-center gap-2">
+                📄 Скачать DOCX
+            </button>
+
+            <a href="/logout" 
+               class="text-gray-500 hover:text-gray-700 font-medium">Выйти</a>
+        </div>
+    </div>
+
+    <!-- Редактор -->
+    <div class="px-12 py-10">
+        <div id="editor" class="bg-white min-h-[75vh]"></div>
+    </div>
+</div>
+
+<script>
+    const quill = new Quill('#editor', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                [{ 'font': [] }],
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'align': [] }],
+                ['link', 'image'],
+                ['clean']
+            ]
+        }
+    });
+
+    // Загрузка сохранённого контента
+    quill.root.innerHTML = `{{ document.content | safe }}`;
+
+    let docId = {{ document.id }};
+    let timeout;
+
+    function saveDocument(isManual = false) {
+        const content = quill.root.innerHTML;
+        const title = document.getElementById('title-input').value.trim() || "Без названия";
+
+        fetch(`/save/${docId}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: new URLSearchParams({ title: title, content: content })
+        }).then(() => {
+            if (isManual) {
+                alert('✅ Документ успешно сохранён!');
+            }
+        });
+    }
+
+    // Автосохранение
+    quill.on('text-change', () => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => saveDocument(false), 2500);
+    });
+
+    // Сохранение названия при потере фокуса
+    document.getElementById('title-input').addEventListener('blur', () => saveDocument(false));
+</script>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Регистрация{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto mt-16">
+    <div class="bg-white p-10 rounded-3xl shadow-xl">
+        <h2 class="text-3xl font-bold text-center mb-8">Регистрация</h2>
+        <form method="post">
+            <input type="text" name="username" placeholder="Придумайте логин" 
+                   required class="w-full p-4 border border-gray-300 rounded-xl mb-5 focus:outline-none focus:border-blue-500">
+            <input type="password" name="password" placeholder="Придумайте пароль" 
+                   required class="w-full p-4 border border-gray-300 rounded-xl mb-8 focus:outline-none focus:border-blue-500">
+            <button type="submit" 
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-medium text-lg">
+                Зарегистрироваться
+            </button>
+        </form>
+        <p class="text-center mt-6">Уже есть аккаунт? <a href="/login" class="text-blue-600 font-medium">Войти</a></p>
+    </div>
+</div>
+{% endblock %}
